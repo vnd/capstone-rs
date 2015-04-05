@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="Source to the Rust file `src/constants.rs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang">
+
+    <title>constants.rs.html -- source</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+</pre><pre class='rust '>
+<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CsArch</span> {
+    <span class='ident'>ARCH_ARM</span> <span class='op'>=</span> <span class='number'>0</span>,    <span class='comment'>// ARM architecture (including Thumb, Thumb-2)</span>
+    <span class='ident'>ARCH_ARM64</span>,      <span class='comment'>// ARM-64, also called AArch64</span>
+    <span class='ident'>ARCH_MIPS</span>,       <span class='comment'>// Mips architecture</span>
+    <span class='ident'>ARCH_X86</span>,        <span class='comment'>// X86 architecture (including x86 &amp; x86-64)</span>
+    <span class='ident'>ARCH_PPC</span>,        <span class='comment'>// PowerPC architecture</span>
+    <span class='ident'>ARCH_SPARC</span>,      <span class='comment'>// Sparc architecture</span>
+    <span class='ident'>ARCH_SYSZ</span>,       <span class='comment'>// SystemZ architecture</span>
+    <span class='ident'>ARCH_XCORE</span>,      <span class='comment'>// XCore architecture</span>
+    <span class='ident'>ARCH_MAX</span>,
+    <span class='ident'>ARCH_ALL</span> <span class='op'>=</span> <span class='number'>0xFFFF</span>, <span class='comment'>// All architectures - for cs_support()</span>
+}
+
+<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CsMode</span> {
+    <span class='ident'>MODE_LITTLE_ENDIAN</span> <span class='op'>=</span> <span class='number'>0</span>,  <span class='comment'>// little-endian mode (default mode)</span>
+    <span class='comment'>// MODE_ARM = 0,    // 32-bit ARM</span>
+    <span class='ident'>MODE_16</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>1</span>,    <span class='comment'>// 16-bit mode (X86)</span>
+    <span class='ident'>MODE_32</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>2</span>,    <span class='comment'>// 32-bit mode (X86)</span>
+    <span class='ident'>MODE_64</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>3</span>,    <span class='comment'>// 64-bit mode (X86, PPC)</span>
+    <span class='ident'>MODE_THUMB</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>4</span>, <span class='comment'>// ARM&#39;s Thumb mode, including Thumb-2</span>
+    <span class='ident'>MODE_MCLASS</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>5</span>,    <span class='comment'>// ARM&#39;s Cortex-M series</span>
+    <span class='ident'>MODE_V8</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>6</span>,    <span class='comment'>// ARMv8 A32 encodings for ARM</span>
+    <span class='comment'>// MODE_MICRO = 1 &lt;&lt; 4, // MicroMips mode (MIPS)</span>
+    <span class='comment'>// MODE_MIPS3 = 1 &lt;&lt; 5, // Mips III ISA</span>
+    <span class='comment'>// MODE_MIPS32R6 = 1 &lt;&lt; 6, // Mips32r6 ISA</span>
+    <span class='comment'>// MODE_MIPSGP64 = 1 &lt;&lt; 7, // General Purpose Registers are 64-bit wide (MIPS)</span>
+    <span class='comment'>// MODE_V9 = 1 &lt;&lt; 4, // SparcV9 mode (Sparc)</span>
+    <span class='ident'>MODE_BIG_ENDIAN</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>,   <span class='comment'>// big-endian mode</span>
+    <span class='comment'>// MODE_MIPS32 = CsMode::MODE_32,    // Mips32 ISA (Mips)</span>
+    <span class='comment'>// MODE_MIPS64 = CsMode::MODE_64,    // Mips64 ISA (Mips)</span>
+}
+
+<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CsErr</span> {
+    <span class='ident'>CS_ERR_OK</span> <span class='op'>=</span> <span class='number'>0</span>,   <span class='comment'>// No error: everything was fine</span>
+    <span class='ident'>CS_ERR_MEM</span>,      <span class='comment'>// Out-Of-Memory error: cs_open(), cs_disasm(), cs_disasm_iter()</span>
+    <span class='ident'>CS_ERR_ARCH</span>,     <span class='comment'>// Unsupported architecture: cs_open()</span>
+    <span class='ident'>CS_ERR_HANDLE</span>,   <span class='comment'>// Invalid handle: cs_op_count(), cs_op_index()</span>
+    <span class='ident'>CS_ERR_CSH</span>,      <span class='comment'>// Invalid csh argument: cs_close(), cs_errno(), cs_option()</span>
+    <span class='ident'>CS_ERR_MODE</span>,     <span class='comment'>// Invalid/unsupported mode: cs_open()</span>
+    <span class='ident'>CS_ERR_OPTION</span>,   <span class='comment'>// Invalid/unsupported option: cs_option()</span>
+    <span class='ident'>CS_ERR_DETAIL</span>,   <span class='comment'>// Information is unavailable because detail option is OFF</span>
+    <span class='ident'>CS_ERR_MEMSETUP</span>, <span class='comment'>// Dynamic memory management uninitialized (see CS_OPT_MEM)</span>
+    <span class='ident'>CS_ERR_VERSION</span>,  <span class='comment'>// Unsupported version (bindings)</span>
+    <span class='ident'>CS_ERR_DIET</span>,     <span class='comment'>// Access irrelevant data in &quot;diet&quot; engine</span>
+    <span class='ident'>CS_ERR_SKIPDATA</span>, <span class='comment'>// Access irrelevant data for &quot;data&quot; instruction in SKIPDATA mode</span>
+    <span class='ident'>CS_ERR_X86_ATT</span>,  <span class='comment'>// X86 AT&amp;T syntax is unsupported (opt-out at compile time)</span>
+    <span class='ident'>CS_ERR_X86_INTEL</span>, <span class='comment'>// X86 Intel syntax is unsupported (opt-out at compile time)</span>
+}
+</pre>
+</section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "capstone";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>
