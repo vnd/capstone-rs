@@ -1,7 +1,9 @@
 #![feature(libc)]
 #![feature(core)]
-#![feature(debug_builders)]
 extern crate libc;
+
+#[macro_use]
+extern crate bitflags;
 
 pub mod instruction;
 pub mod constants;
