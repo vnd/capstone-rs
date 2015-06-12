@@ -1,4 +1,5 @@
 #[repr(C)]
+#[derive(Debug)]
 /// Capstone architectures
 pub enum CsArch {
     /// ARM architecture (including Thumb, Thumb-2)
@@ -61,6 +62,7 @@ bitflags! {
 }
 
 #[repr(C)]
+#[derive(Debug)]
 /// Capstone errors
 pub enum CsErr {
     /// No error: everything was fine
