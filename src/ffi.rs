@@ -1,6 +1,6 @@
 use libc;
 use instruction::Insn;
-use constants::{CsArch, CsMode, CsErr};
+use constants::{CsArch, CsMode, CsErr, CsOptType};
 use csh;
 
 #[allow(dead_code)]
@@ -13,7 +13,8 @@ extern "C" {
     pub fn cs_disasm_ex(handle: csh, code: *const u8, code_size: libc::size_t,
                         address: u64, count: libc::size_t, insn: &mut *const Insn) -> libc::size_t;
     pub fn cs_free(insn: *const Insn, count: libc::size_t);
-    pub fn cs_option(handle: csh, opt: u32, val: libc::size_t) -> CsErr;
+    pub fn cs_option(handle: csh, opt: CsOptType, val: libc::size_t) -> CsErr;
     pub fn cs_errno(handle: csh) -> CsErr;
+    pub fn cs_group_name(handle: csh, name: u8) -> *const libc::c_char;
 }
 

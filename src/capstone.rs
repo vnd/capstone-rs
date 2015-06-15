@@ -1,7 +1,8 @@
 use libc;
 use std::ptr;
 use constants::*;
-use ffi::{cs_close,cs_open,cs_disasm,cs_option,cs_errno};
+use std::ffi::CStr;
+use ffi::{cs_close,cs_open,cs_disasm,cs_option,cs_errno,cs_group_name};
 
 use instruction::{Insn,Instructions};
 
@@ -13,9 +14,6 @@ impl Capstone {
     pub fn new(arch: CsArch, mode: CsMode) -> Option<Capstone> {
         let mut handle: libc::size_t = 0;
         if let CsErr::CS_ERR_OK = unsafe { cs_open(arch, mode, &mut handle) } {
-            unsafe {
-                cs_option(handle, 5, 3);
-            }
             Some(Capstone {
                 csh: handle
             })
@@ -36,6 +34,43 @@ impl Capstone {
         }
 
         Some(Instructions::from_raw_parts(ptr, insn_count as isize))
+    }
+
+    pub fn detail(&mut self, active: bool) -> Result<(), CsErr> {
+        unsafe {
+            match cs_option(self.csh, CsOptType::CS_OPT_DETAIL, match active {
+                true => CsOptValue::CS_OPT_ON as libc::size_t,
+                false => CsOptValue::CS_OPT_OFF as libc::size_t,
+            }) {
+                CsErr::CS_ERR_OK => Ok(()),
+                e => Err(e),
+            }
+        }
+    }
+
+    pub fn skipdata(&mut self, active: bool) -> Result<(), CsErr> {
+        unsafe {
+            match cs_option(self.csh, CsOptType::CS_OPT_SKIPDATA, match active {
+                true => CsOptValue::CS_OPT_ON as libc::size_t,
+                false => CsOptValue::CS_OPT_OFF as libc::size_t,
+            }) {
+                CsErr::CS_ERR_OK => Ok(()),
+                e => Err(e),
+            }
+        }
+    }
+    pub fn group_name(&self, group: u8) -> Option<&str> {
+        unsafe {
+            let name = cs_group_name(self.csh, group);
+            if name.is_null() {
+                None
+            } else {
+                match CStr::from_ptr(name).to_str() {
+                    Ok(str) => Some(str),
+                    Err(_) => None,
+                }
+            }
+        }
     }
 }
 

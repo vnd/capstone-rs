@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[repr(C)]
 #[derive(Debug)]
 /// Capstone architectures
@@ -58,6 +60,52 @@ bitflags! {
         const MODE_MIPS32 = MODE_32.bits,
         #[doc="Mips64 ISA (Mips)"]
         const MODE_MIPS64 = MODE_64.bits,
+    }
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub enum CsOptType {
+    CS_OPT_SYNTAX = 1,
+    CS_OPT_DETAIL,
+    CS_OPT_MODE,
+    CS_OPT_MEM,
+    CS_OPT_SKIPDATA,
+    CS_OPT_SKIPDATA_SETUP,
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub enum CsOptValue {
+    CS_OPT_OFF = 0,
+    CS_OPT_ON = 3,
+}
+
+#[repr(C)]
+pub struct CsDetail {
+    regs_read: [u8; 12],
+    regs_read_count: u8,
+    regs_write: [u8; 20],
+    regs_write_count: u8,
+    groups: [u8; 8],
+    groups_count: u8,
+
+    arch_data: [u8; 185],
+}
+
+impl CsDetail {
+    pub fn groups(&self) -> &[u8] {
+        &self.groups[0..self.groups_count as usize]
+    }
+}
+
+impl fmt::Debug for CsDetail {
+    fn fmt(&self, w: &mut fmt::Formatter) -> fmt::Result {
+        w.debug_struct("CsDetail")
+            .field("regs_read_count", &self.regs_read_count)
+            .field("regs_write_count", &self.regs_write_count)
+            .field("groups_count", &self.groups_count)
+            .finish()
     }
 }
 

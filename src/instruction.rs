@@ -5,6 +5,7 @@ use std::str;
 use std::ffi::CStr;
 use std::fmt::{Debug, Formatter, Error};
 use ffi::cs_free;
+use constants::CsDetail;
 
 // Using an actual slice is causing issues with auto deref, instead implement a custom iterator and
 // drop trait
@@ -65,7 +66,7 @@ pub struct Insn {
     pub bytes: [u8; 16usize],
     pub mnemonic: [::libc::c_char; 32usize],
     pub op_str: [::libc::c_char; 160usize],
-    detail: *mut libc::c_void, // Opaque cs_detail
+    detail: *mut CsDetail, // Opaque cs_detail
 }
 
 impl Insn {
@@ -77,6 +78,15 @@ impl Insn {
     pub fn op_str(&self) -> Option<&str> {
         let cstr = unsafe { CStr::from_ptr(self.op_str.as_ptr()) };
         str::from_utf8(cstr.to_bytes()).ok()
+    }
+    pub fn detail(&self) -> Option<&CsDetail> {
+        if self.detail.is_null() {
+            None
+        } else {
+            unsafe {
+                Some(&*self.detail)
+            }
+        }
     }
 }
 
