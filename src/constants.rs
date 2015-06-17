@@ -1,4 +1,5 @@
 use std::fmt;
+use std::mem;
 
 #[repr(C)]
 #[derive(Debug)]
@@ -81,21 +82,54 @@ pub enum CsOptValue {
     CS_OPT_ON = 3,
 }
 
+#[allow(non_camel_case_types)]
+#[repr(u8)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum CsGroup {
+    CS_GRP_INVALID = 0,
+    CS_GRP_JUMP,
+    CS_GRP_CALL,
+    CS_GRP_RET,
+    CS_GRP_INT,
+    CS_GRP_IRET,
+}
+
 #[repr(C)]
 pub struct CsDetail {
     regs_read: [u8; 12],
     regs_read_count: u8,
     regs_write: [u8; 20],
     regs_write_count: u8,
-    groups: [u8; 8],
+    groups: [CsGroup; 8],
     groups_count: u8,
 
-    arch_data: [u8; 185],
+    arch_data: [u64; 185],
+}
+
+impl Clone for CsDetail {
+    fn clone(&self) -> CsDetail {
+        let mut new_arr = [0; 185];
+        for i in 0..185 {
+            new_arr[i] = self.arch_data[i]
+        }
+        CsDetail {
+            regs_read: self.regs_read.clone(),
+            regs_read_count: self.regs_read_count.clone(),
+            regs_write: self.regs_write.clone(),
+            regs_write_count: self.regs_write_count.clone(),
+            groups: self.groups.clone(),
+            groups_count: self.groups_count.clone(),
+            arch_data: new_arr,
+        }
+    }
 }
 
 impl CsDetail {
-    pub fn groups(&self) -> &[u8] {
+    pub fn groups(&self) -> &[CsGroup] {
         &self.groups[0..self.groups_count as usize]
+    }
+    pub fn data_x86(&self) -> &X86Detail {
+        unsafe { mem::transmute(&self.arch_data) }
     }
 }
 
@@ -107,6 +141,52 @@ impl fmt::Debug for CsDetail {
             .field("groups_count", &self.groups_count)
             .finish()
     }
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub enum X86OpType {
+	X86_OP_INVALID = 0, // = CS_OP_INVALID (Uninitialized).
+	X86_OP_REG, // = CS_OP_REG (Register operand).
+	X86_OP_IMM, // = CS_OP_IMM (Immediate operand).
+	X86_OP_MEM, // = CS_OP_MEM (Memory operand).
+	X86_OP_FP,  //  = CS_OP_FP  (Floating-Point operand).
+}
+
+#[derive(Debug)]
+pub struct X86Op {
+    pub ty: X86OpType,
+    pub data: [u64; 3],
+    pub size: u8,
+    pub avx_bcase: u32,
+    pub avx_zero_opmask: u32,
+}
+
+impl X86Op {
+    pub fn data_imm(&self) -> i64 {
+        unsafe { *mem::transmute::<&[u64; 3], &i64>(&self.data) }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct X86Detail {
+    pub prefix: [::libc::uint8_t; 4],
+    pub opcode: [::libc::uint8_t; 4],
+    pub rex: ::libc::uint8_t,
+    pub addr_size: ::libc::uint8_t,
+    pub modrm: ::libc::uint8_t,
+    pub sib: ::libc::uint8_t,
+    pub disp: ::libc::uint32_t,
+    pub sib_index: ::libc::uint32_t,
+    pub sib_scale: ::libc::uint8_t,
+    pub sib_base: ::libc::uint32_t,
+    pub sse_cc: ::libc::uint32_t,
+    pub avx_cc: ::libc::uint32_t,
+    pub avx_sae: ::libc::uint8_t,
+    pub avx_rm: ::libc::uint32_t,
+    pub op_count: ::libc::uint8_t,
+    pub operands: [X86Op; 8],
 }
 
 #[repr(C)]

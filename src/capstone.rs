@@ -2,7 +2,7 @@ use libc;
 use std::ptr;
 use constants::*;
 use std::ffi::CStr;
-use ffi::{cs_close,cs_open,cs_disasm,cs_option,cs_errno,cs_group_name};
+use ffi::{cs_close,cs_open,cs_disasm,cs_option,cs_errno,cs_group_name,cs_disasm_iter,cs_malloc,cs_free};
 
 use instruction::{Insn,Instructions};
 
@@ -14,6 +14,7 @@ impl Capstone {
     pub fn new(arch: CsArch, mode: CsMode) -> Option<Capstone> {
         let mut handle: libc::size_t = 0;
         if let CsErr::CS_ERR_OK = unsafe { cs_open(arch, mode, &mut handle) } {
+            println!("got cs: {:#x}", handle);
             Some(Capstone {
                 csh: handle
             })
@@ -34,6 +35,20 @@ impl Capstone {
         }
 
         Some(Instructions::from_raw_parts(ptr, insn_count as isize))
+    }
+
+    #[must_use]
+    pub fn walk_insts<F>(&mut self, code: &[u8], mut addr: u64, mut f: F) -> Result<(), CsErr> where F: FnMut(&Insn) {
+        let mut code_ptr = code.as_ptr();
+        let mut code_sz = code.len() as u64;
+        unsafe {
+            let insn = cs_malloc(&mut self.csh);
+            while cs_disasm_iter(self.csh, &mut code_ptr, &mut code_sz, &mut addr, insn) {
+                f(&*insn);
+            }
+            cs_free(insn, 1);
+        }
+        Ok(())
     }
 
     pub fn detail(&mut self, active: bool) -> Result<(), CsErr> {
@@ -59,7 +74,8 @@ impl Capstone {
             }
         }
     }
-    pub fn group_name(&self, group: u8) -> Option<&str> {
+
+    pub fn group_name(&self, group: CsGroup) -> Option<&str> {
         unsafe {
             let name = cs_group_name(self.csh, group);
             if name.is_null() {
