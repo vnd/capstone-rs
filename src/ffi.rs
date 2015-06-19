@@ -188,6 +188,10 @@ impl InsnDetail {
     pub unsafe fn data_x86(&self) -> &detail::X86Detail {
         mem::transmute(&self.arch_data)
     }
+
+    pub unsafe fn data_arm(&self) -> &detail::ARMDetail {
+        mem::transmute(&self.arch_data)
+    }
 }
 
 impl fmt::Debug for InsnDetail {
@@ -203,6 +207,8 @@ impl fmt::Debug for InsnDetail {
 /// Instruction platform-specific details
 pub mod detail {
     use std::mem;
+    use std::fmt;
+
     #[repr(C)]
     #[derive(Debug)]
     /// Platform-specific instruction detail for Intel x86 family
@@ -277,6 +283,108 @@ pub mod detail {
             }
         }
     }
+    #[repr(C)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum ARMOpType {
+        ARM_OP_INVALID = 0,
+        ARM_OP_REG,
+        ARM_OP_IMM,
+        ARM_OP_MEM,
+        ARM_OP_FP,
+        ARM_OP_CIMM = 64,
+        ARM_OP_PIMM,
+        ARM_OP_SETEND,
+        ARM_OP_SYSREG,
+    }
+
+    #[repr(C)]
+    #[derive(Debug, PartialEq, Eq)]
+    pub enum ARMSetendType {
+        ARM_SETEND_INVALID = 0,
+        ARM_SETEND_BE,
+        ARM_SETEND_LE,
+    }
+
+    #[repr(C)]
+    #[derive(Debug)]
+    pub struct ARMOpMem {
+        pub base: u32,
+        pub index: u32,
+        pub scale: i32,
+        pub disp: i32,
+    }
+
+    #[repr(C)]
+    #[derive(Debug)]
+    pub struct ARMOp {
+        pub vector_index: i32,
+        pub shift_type: u32,
+        pub value: u32,
+        pub ty: ARMOpType,
+        pub data: [u64; 2],
+        pub subtracted: bool,
+    }
+
+    #[derive(Debug)]
+    /// Instruction operand data for ARM
+    pub enum ARMOpData {
+        /// Immediate operand
+        Imm(u32),
+        Other,
+    }
+
+    impl ARMOp {
+        unsafe fn data_imm(&self) -> u32 {
+            *mem::transmute::<&[u64; 2], &u32>(&self.data)
+        }
+        pub fn data(&self) -> ARMOpData {
+            match self.ty {
+                ARMOpType::ARM_OP_IMM => ARMOpData::Imm(unsafe { self.data_imm() }),
+                _ => ARMOpData::Other, // TODO this
+            }
+        }
+    }
+
+    #[repr(C)]
+    pub struct ARMDetail {
+        pub usermode: bool,
+        pub vector_size: i32,
+        pub vector_data: u32,
+        pub cps_mode: u32,
+        pub cps_flag: u32,
+        pub cc: u32,
+        pub update_flags: bool,
+        pub writeback: bool,
+        pub mem_barrier: u32,
+        op_count: u32,
+        operands: [ARMOp; 36],
+    }
+
+
+    impl ARMDetail {
+        pub fn operands(&self) -> &[ARMOp] {
+            &self.operands[0..self.op_count as usize]
+        }
+    }
+
+    impl fmt::Debug for ARMDetail {
+        fn fmt(&self, w: &mut fmt::Formatter) -> fmt::Result {
+            w.debug_struct("ARMDetail")
+                .field("usermode", &self.usermode)
+                .field("vector_size", &self.vector_size)
+                .field("vector_data", &self.vector_data)
+                .field("cps_mode", &self.cps_mode)
+                .field("cps_flag", &self.cps_flag)
+                .field("cc", &self.cc)
+                .field("update_flags", &self.update_flags)
+                .field("writeback", &self.writeback)
+                .field("mem_barrier", &self.mem_barrier)
+                .field("op_count", &self.op_count)
+                .field("operands", &self.operands())
+                .finish()
+        }
+    }
+
 }
 
 #[repr(C)]
