@@ -1,30 +1,20 @@
+//! Bindings to the Capstone Engine (http://www.capstone-engine.org)
 #![feature(libc)]
 #![feature(cstr_to_str)]
-#![feature(core)]
+#![feature(collections)]
 extern crate libc;
 
 #[macro_use]
 extern crate bitflags;
 
-pub mod instruction;
-pub mod constants;
-pub mod ffi;
-pub mod capstone;
+mod ffi;
+mod handle;
+mod error;
 
-pub use instruction::*;
-pub use constants::*;
-
-pub use capstone::Capstone;
-
-/// An opaque reference to a capstone engine.
-///
-/// bindgen by default used this type name everywhere, so it is easier to leave it with a confusing
-/// name.
-///
-/// It should not be exported, rust's new visibility rules make tackling this not immediately
-/// obvious
-#[allow(non_camel_case_types)]
-pub type csh = libc::size_t;
+pub use handle::{Handle,HandleBuilder,Instructions};
+pub use ffi::{Insn,InsnDetail,CsArch,CsGroup,mode,detail};
+pub use mode::CsMode;
+pub use error::CsError;
 
 #[cfg(test)]
 mod test {
