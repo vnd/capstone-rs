@@ -136,11 +136,17 @@ pub mod optval {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// Capstone instruction group
 pub enum CsGroup {
+    /// Invalid group
     CS_GRP_INVALID = 0,
+    /// Jump instruction (jmp, bl, xbegin, etc)
     CS_GRP_JUMP,
+    /// Procedure call instruction (call)
     CS_GRP_CALL,
+    /// Procedure return instruction (ret)
     CS_GRP_RET,
+    /// Interrupt instruction (int, swi)
     CS_GRP_INT,
+    /// Interrupt return instruction (iret)
     CS_GRP_IRET,
 }
 
@@ -226,14 +232,19 @@ pub mod detail {
     }
 
     #[repr(C)]
-    #[derive(Debug, PartialEq, Eq)]
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     /// Instruction operand type for Intel x86 family
     pub enum X86OpType {
-        X86_OP_INVALID = 0, // = CS_OP_INVALID (Uninitialized).
-        X86_OP_REG, // = CS_OP_REG (Register operand).
-        X86_OP_IMM, // = CS_OP_IMM (Immediate operand).
-        X86_OP_MEM, // = CS_OP_MEM (Memory operand).
-        X86_OP_FP,  //  = CS_OP_FP  (Floating-Point operand).
+        /// Uninitialized
+        X86_OP_INVALID = 0,
+        /// Register operand
+        X86_OP_REG,
+        /// Immediate operand
+        X86_OP_IMM,
+        /// Memory operand
+        X86_OP_MEM,
+        /// Floating-Point operand
+        X86_OP_FP,
     }
 
     #[derive(Debug)]
@@ -246,11 +257,12 @@ pub mod detail {
         pub avx_zero_opmask: u32,
     }
 
-    #[derive(Debug)]
+    #[derive(Copy, Clone, Debug)]
     /// Instruction operand data for Intel x86 family
     pub enum X86OpData {
         /// Immediate operand
         Imm(i64),
+        /// Other operand
         Other,
     }
 

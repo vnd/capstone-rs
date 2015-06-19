@@ -1,7 +1,7 @@
 //! Bindings to the Capstone Engine (http://www.capstone-engine.org)
 #![feature(libc)]
 #![feature(cstr_to_str)]
-#![feature(collections)]
+#![feature(clone_from_slice)]
 extern crate libc;
 
 #[macro_use]
