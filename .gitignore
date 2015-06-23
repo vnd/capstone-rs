@@ -1,3 +1,4 @@
 demo
 target
 Cargo.lock
+*.swp
