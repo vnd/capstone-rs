@@ -27,7 +27,10 @@ impl Handle {
         let mut code_ptr = code.as_ptr();
         let mut code_sz = code.len() as u64;
         unsafe {
-            let insn = ffi::cs_malloc(&mut self.0);
+            let insn = ffi::cs_malloc(self.0);
+            if insn.is_null() {
+                return Err(ffi::cs_errno(self.0));
+            }
             while ffi::cs_disasm_iter(self.0, &mut code_ptr, &mut code_sz, &mut addr, insn) {
                 f(&*insn);
             }

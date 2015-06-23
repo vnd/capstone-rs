@@ -481,7 +481,7 @@ pub fn new_csh(arch: CsArch, mode: CsMode) -> Result<::Handle, ::CsError> {
 extern "C" {
     pub fn cs_open(arch: CsArch, mode: CsMode, handle: *mut CsHandle) -> ::CsError;
     pub fn cs_close(handle: *mut CsHandle) -> ::CsError;
-    pub fn cs_malloc(handle: *mut CsHandle) -> *mut Insn;
+    pub fn cs_malloc(handle: CsHandle) -> *mut Insn;
     pub fn cs_disasm(handle: CsHandle, code: *const u8, code_size: libc::size_t,
                      address: u64, count: libc::size_t, insn: &mut *const Insn) -> libc::size_t;
     pub fn cs_disasm_iter(handle: CsHandle, code: *mut *const u8, code_size: *mut libc::size_t,
