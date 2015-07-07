@@ -192,6 +192,9 @@ impl InsnDetail {
     pub unsafe fn data_arm(&self) -> &detail::ARMDetail {
         mem::transmute(&self.arch_data)
     }
+    pub unsafe fn data_ppc(&self) -> &detail::PPCDetail {
+        mem::transmute(&self.arch_data)
+    }
 }
 
 impl fmt::Debug for InsnDetail {
@@ -283,6 +286,53 @@ pub mod detail {
             }
         }
     }
+
+    #[repr(C)]
+    #[derive(PartialEq, Eq)]
+    pub enum PPCOpType {
+        PPC_OP_INVALID = 0,
+        PPC_OP_REG,
+        PPC_OP_IMM,
+        PPC_OP_MEM,
+    }
+
+    pub enum PPCOpData {
+        /// Immediate operand
+        Imm(u32),
+        Other,
+    }
+
+    pub struct PPCOp {
+        pub ty: PPCOpType,
+        pub data: [u32; 3],
+    }
+
+    impl PPCOp {
+        unsafe fn data_imm(&self) -> u32 {
+            *mem::transmute::<_, &u32>(&self.data)
+        }
+        pub fn data(&self) -> PPCOpData {
+            match self.ty {
+                PPCOpType::PPC_OP_IMM => PPCOpData::Imm(unsafe { self.data_imm() }),
+                _ => PPCOpData::Other, // TODO this
+            }
+        }
+    }
+
+    pub struct PPCDetail {
+        pub ppc_bc: u32,
+        pub ppc_bh: u32,
+        pub update_cr0: bool,
+        op_count: u8,
+        operands: [PPCOp; 8],
+    }
+
+    impl PPCDetail {
+        pub fn operands(&self) -> &[PPCOp] {
+            &self.operands[0..self.op_count as usize]
+        }
+    }
+
     #[repr(C)]
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     pub enum ARMOpType {
