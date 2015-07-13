@@ -131,6 +131,7 @@ pub mod optval {
     }
 }
 
+//FIXME Debug print shows unknown groups as IRET
 #[allow(non_camel_case_types)]
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
