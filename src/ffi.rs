@@ -494,7 +494,6 @@ impl fmt::Debug for Insn {
 }
 
 pub fn set_opt(csh: CsHandle, opt: CsOptType, val: CsOptValue) -> Result<(), ::CsError> {
-    println!("Called set_opt for {:?} to {}", opt, val);
     unsafe {
         match cs_option(csh, opt, val) {
             ::CsError::CS_ERR_OK => Ok(()),
