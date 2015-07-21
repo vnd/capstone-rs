@@ -98,7 +98,7 @@ pub use ffi::optval::CsOptValue;
 pub mod optval {
     use std::fmt;
     #[repr(C)]
-    pub struct CsOptValue(u32);
+    pub struct CsOptValue(pub u32);
     /// Turn OFF an option
     pub const CS_OPT_OFF: CsOptValue = CsOptValue(0);
     /// Turn ON an option
@@ -472,7 +472,8 @@ impl Insn {
     }
     /// Architecture-independent instruction detail
     pub fn detail(&self) -> Option<&InsnDetail> {
-        if self.detail.is_null() {
+        // ID 0 is skipdata
+        if self.detail.is_null() || self.id == 0 {
             None
         } else {
             unsafe {
@@ -495,7 +496,7 @@ impl fmt::Debug for Insn {
 
 pub fn set_opt(csh: CsHandle, opt: CsOptType, val: CsOptValue) -> Result<(), ::CsError> {
     unsafe {
-        match cs_option(csh, opt, val) {
+        match cs_option(csh, opt, val.0) {
             ::CsError::CS_ERR_OK => Ok(()),
             e => Err(e),
         }
@@ -537,7 +538,7 @@ extern "C" {
     pub fn cs_disasm_iter(handle: CsHandle, code: *mut *const u8, code_size: *mut libc::size_t,
                           address: *mut u64, insn: *const Insn) -> bool;
     pub fn cs_free(insn: *const Insn, count: libc::size_t);
-    pub fn cs_option(handle: CsHandle, opt: CsOptType, val: CsOptValue) -> ::CsError;
+    pub fn cs_option(handle: CsHandle, opt: CsOptType, val: u32) -> ::CsError;
     pub fn cs_errno(handle: CsHandle) -> ::CsError;
     pub fn cs_group_name(handle: CsHandle, name: CsGroup) -> *const libc::c_char;
     pub fn cs_strerror(code: ::CsError) -> *const libc::c_char;
