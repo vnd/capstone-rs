@@ -25,7 +25,7 @@ impl Handle {
     /// usage)
     pub fn walk_insts<F>(&mut self, code: &[u8], mut addr: u64, mut f: F) -> Result<(), ::CsError> where F: FnMut(&ffi::Insn) {
         let mut code_ptr = code.as_ptr();
-        let mut code_sz = code.len() as u64;
+        let mut code_sz = code.len();
         unsafe {
             let insn = ffi::cs_malloc(self.0);
             if insn.is_null() {
