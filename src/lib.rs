@@ -1,5 +1,4 @@
 //! Bindings to the Capstone Engine (http://www.capstone-engine.org)
-#![feature(libc)]
 #![feature(clone_from_slice)]
 extern crate libc;
 

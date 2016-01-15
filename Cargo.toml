@@ -10,3 +10,4 @@ repository = "https://github.com/richo/capstone-rs"
 
 [dependencies]
 bitflags = '*'
+libc = "*"
