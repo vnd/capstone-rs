@@ -5,7 +5,7 @@ extern crate libc;
 #[macro_use]
 extern crate bitflags;
 
-mod ffi;
+pub mod ffi;
 mod handle;
 mod error;
 

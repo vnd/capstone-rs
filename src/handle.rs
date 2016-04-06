@@ -23,7 +23,7 @@ impl Handle {
     #[must_use]
     /// Walk over disassembled instructions, one at a time (fixed memory
     /// usage)
-    pub fn walk_insts<F>(&mut self, code: &[u8], mut addr: u64, mut f: F) -> Result<(), ::CsError> where F: FnMut(&ffi::Insn) {
+    pub fn walk_insts<F>(&self, code: &[u8], mut addr: u64, mut f: F) -> Result<(), ::CsError> where F: FnMut(&ffi::Insn) {
         let mut code_ptr = code.as_ptr();
         let mut code_sz = code.len();
         unsafe {
