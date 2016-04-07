@@ -528,6 +528,55 @@ pub mod detail {
 
     #[repr(C)]
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum ARMSysreg {
+        //> Special registers for MSR
+        ARM_SYSREG_INVALID = 0,
+
+        // SPSR* registers can be OR combined
+        ARM_SYSREG_SPSR_C = 1,
+        ARM_SYSREG_SPSR_X = 2,
+        ARM_SYSREG_SPSR_S = 4,
+        ARM_SYSREG_SPSR_F = 8,
+
+        // CPSR* registers can be OR combined
+        ARM_SYSREG_CPSR_C = 16,
+        ARM_SYSREG_CPSR_X = 32,
+        ARM_SYSREG_CPSR_S = 64,
+        ARM_SYSREG_CPSR_F = 128,
+
+        // independent registers
+        ARM_SYSREG_APSR = 256,
+        ARM_SYSREG_APSR_G,
+        ARM_SYSREG_APSR_NZCVQ,
+        ARM_SYSREG_APSR_NZCVQG,
+
+        ARM_SYSREG_IAPSR,
+        ARM_SYSREG_IAPSR_G,
+        ARM_SYSREG_IAPSR_NZCVQG,
+
+        ARM_SYSREG_EAPSR,
+        ARM_SYSREG_EAPSR_G,
+        ARM_SYSREG_EAPSR_NZCVQG,
+
+        ARM_SYSREG_XPSR,
+        ARM_SYSREG_XPSR_G,
+        ARM_SYSREG_XPSR_NZCVQG,
+
+        ARM_SYSREG_IPSR,
+        ARM_SYSREG_EPSR,
+        ARM_SYSREG_IEPSR,
+
+        ARM_SYSREG_MSP,
+        ARM_SYSREG_PSP,
+        ARM_SYSREG_PRIMASK,
+        ARM_SYSREG_BASEPRI,
+        ARM_SYSREG_BASEPRI_MAX,
+        ARM_SYSREG_FAULTMASK,
+        ARM_SYSREG_CONTROL,
+    }
+
+    #[repr(C)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     pub enum ARMInsn {
         ARM_INS_INVALID = 0,
 
@@ -991,21 +1040,25 @@ pub mod detail {
         pub subtracted: bool,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq)]
     /// Instruction operand data for ARM
     pub enum ARMOpData {
         /// Immediate operand
         Imm(u32),
+        Reg(ARMReg),
+        Sysreg(ARMSysreg),
         Other,
     }
 
     impl ARMOp {
-        unsafe fn data_imm(&self) -> u32 {
+        unsafe fn data_raw(&self) -> u32 {
             *mem::transmute::<&[u64; 2], &u32>(&self.data)
         }
         pub fn data(&self) -> ARMOpData {
             match self.ty {
-                ARMOpType::ARM_OP_IMM => ARMOpData::Imm(unsafe { self.data_imm() }),
+                ARMOpType::ARM_OP_IMM => ARMOpData::Imm(unsafe { self.data_raw() }),
+                ARMOpType::ARM_OP_REG => ARMOpData::Reg(unsafe { mem::transmute( self.data_raw()) }),
+                ARMOpType::ARM_OP_SYSREG => ARMOpData::Sysreg(unsafe { mem::transmute(self.data_raw())}),
                 _ => ARMOpData::Other, // TODO this
             }
         }
