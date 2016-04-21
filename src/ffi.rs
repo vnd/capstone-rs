@@ -1021,7 +1021,7 @@ pub mod detail {
     }
 
     #[repr(C)]
-    #[derive(Debug)]
+    #[derive(Debug, PartialEq)]
     pub struct ARMOpMem {
         pub base: u32,
         pub index: u32,
@@ -1047,6 +1047,7 @@ pub mod detail {
         Imm(u32),
         Reg(ARMReg),
         Sysreg(ARMSysreg),
+        Mem(ARMOpMem),
         Other,
     }
 
@@ -1059,6 +1060,7 @@ pub mod detail {
                 ARMOpType::ARM_OP_IMM => ARMOpData::Imm(unsafe { self.data_raw() }),
                 ARMOpType::ARM_OP_REG => ARMOpData::Reg(unsafe { mem::transmute( self.data_raw()) }),
                 ARMOpType::ARM_OP_SYSREG => ARMOpData::Sysreg(unsafe { mem::transmute(self.data_raw())}),
+                ARMOpType::ARM_OP_MEM => ARMOpData::Mem(unsafe { mem::transmute(self.data)}),
                 _ => ARMOpData::Other, // TODO this
             }
         }
