@@ -1061,6 +1061,8 @@ pub mod detail {
                 ARMOpType::ARM_OP_REG => ARMOpData::Reg(unsafe { mem::transmute( self.data_raw()) }),
                 ARMOpType::ARM_OP_SYSREG => ARMOpData::Sysreg(unsafe { mem::transmute(self.data_raw())}),
                 ARMOpType::ARM_OP_MEM => ARMOpData::Mem(unsafe { mem::transmute(self.data)}),
+                ARMOpType::ARM_OP_PIMM => ARMOpData::Imm(unsafe { self.data_raw() }),
+                ARMOpType::ARM_OP_CIMM => ARMOpData::Imm(unsafe { self.data_raw() }),
                 _ => ARMOpData::Other, // TODO this
             }
         }
