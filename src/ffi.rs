@@ -1030,11 +1030,27 @@ pub mod detail {
     }
 
     #[repr(C)]
+    #[derive(Debug, PartialEq)]
+    pub enum ARMShifter {
+        ARM_SFT_INVALID = 0,
+        ARM_SFT_ASR,	// shift with immediate const
+        ARM_SFT_LSL,	// shift with immediate const
+        ARM_SFT_LSR,	// shift with immediate const
+        ARM_SFT_ROR,	// shift with immediate const
+        ARM_SFT_RRX,	// shift with immediate const
+        ARM_SFT_ASR_REG,	// shift with register
+        ARM_SFT_LSL_REG,	// shift with register
+        ARM_SFT_LSR_REG,	// shift with register
+        ARM_SFT_ROR_REG,	// shift with register
+        ARM_SFT_RRX_REG,	// shift with register
+    }
+
+    #[repr(C)]
     #[derive(Debug)]
     pub struct ARMOp {
         pub vector_index: i32,
         pub shift_type: u32,
-        pub value: u32,
+        pub shift_value: u32,
         pub ty: ARMOpType,
         pub data: [u64; 2],
         pub subtracted: bool,
@@ -1054,6 +1070,9 @@ pub mod detail {
     impl ARMOp {
         unsafe fn data_raw(&self) -> u32 {
             *mem::transmute::<&[u64; 2], &u32>(&self.data)
+        }
+        pub unsafe fn shifter(&self) -> ARMShifter {
+            mem::transmute(self.shift_type)
         }
         pub fn data(&self) -> ARMOpData {
             match self.ty {
