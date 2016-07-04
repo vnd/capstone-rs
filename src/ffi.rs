@@ -162,7 +162,7 @@ pub struct InsnDetail {
     groups: [CsGroup; 8],
     groups_count: u8,
 
-    arch_data: [u64; 185],
+    pub arch_data: [u64; 185],
 }
 
 impl Clone for InsnDetail {
@@ -1046,7 +1046,7 @@ pub mod detail {
     }
 
     #[repr(C)]
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct ARMOp {
         pub vector_index: i32,
         pub shift_type: u32,
@@ -1098,8 +1098,8 @@ pub mod detail {
         pub update_flags: bool,
         pub writeback: bool,
         pub mem_barrier: u32,
-        op_count: u32,
-        operands: [ARMOp; 36],
+        pub op_count: u32,
+        pub operands: [ARMOp; 36],
     }
 
 
@@ -1133,12 +1133,12 @@ pub mod detail {
 /// A disassembled Capstone instruction
 pub struct Insn {
     pub id: ::libc::c_uint,
-    address: u64,
+    pub address: u64,
     size: u16,
     pub bytes: [u8; 16usize],
     mnemonic: [::libc::c_char; 32usize],
     op_str: [::libc::c_char; 160usize],
-    detail: *mut InsnDetail,
+    pub detail: *mut InsnDetail,
 }
 
 impl Insn {
